@@ -89,7 +89,9 @@ RUN set -xe \
 	&& git config --global url.https://.insteadOf git:// \
 	&& git config --global advice.detachedHead false \
 	&& git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git . \
-	&& git submodule update --init --recursive >/dev/null \
+	&& git config --file=.gitmodules submodule."lib/pkp".url https://github.com/pkp/pkp-lib.git \
+	&& git submodule sync \
+	&& git submodule update --init --recursive --remote >/dev/null \
 	&& ln -s /usr/bin/php5 /usr/bin/php \
 	# Composer vudu:
 	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer.phar \
