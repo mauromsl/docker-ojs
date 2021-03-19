@@ -4,7 +4,7 @@
 # Call example:
 # $ docker-compose up
 
-version: "3.6"
+version: "3.3"
 
 networks:
   inside:
@@ -29,7 +29,7 @@ services:
 
 
   arizona:
-    image: birkbeckctp/ojs:2_4_3-0 #pkpofficial/ojs:2_4_6-0
+    image: pkpofficial/ojs:2_4_6-0
     env_file:
       - .env
     container_name: "arizona_ojs_app_${COMPOSE_PROJECT_NAME}"
@@ -47,8 +47,8 @@ services:
       - ./volumes/config/config.inc.php:/var/www/html/config.inc.php
         #      - ./config/apache.htaccess:/var/www/html/.htaccess
         #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./volumes/plugins/janeway:/var/www/html/plugins/generic/janeway
       - ./volumes/plugins/ojs-janeway:/var/www/html/plugins/generic/ojs-janeway
-      - ./volumes/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
 
     networks:
       - inside
@@ -64,7 +64,7 @@ services:
     hostname: "cg-${COMPOSE_PROJECT_NAME}"
     restart: always
     ports:
-      - "8081:80"
+      - "8082:80"
     volumes:
       - /etc/localtime:/etc/localtime
        # Create files or folders first and check permisions, to avoid errors:
@@ -74,6 +74,59 @@ services:
       - ./volumes/cg/config/config.inc.php:/var/www/html/config.inc.php
         #      - ./config/apache.htaccess:/var/www/html/.htaccess
         #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./volumes/cg/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
+
+    networks:
+      - inside
+    depends_on:
+      - db
+    restart: always
+
+  ucl:
+    image: birkbeckctp/ojs:2_4_3-0
+    env_file:
+      - .env
+    container_name: "ucl_ojs_app_${COMPOSE_PROJECT_NAME}"
+    hostname: "ucl-${COMPOSE_PROJECT_NAME}"
+    restart: always
+    ports:
+      - "8083:80"
+    volumes:
+      - /etc/localtime:/etc/localtime
+       # Create files or folders first and check permisions, to avoid errors:
+      - ./volumes/ucl/files:/vol/ojsfiles
+      - ./volumes/ucl/public:/var/www/html/public
+        #      - ./volumes/logs:/var/log/apache2
+      - ./volumes/ucl/config/config.inc.php:/var/www/html/config.inc.php
+        #      - ./config/apache.htaccess:/var/www/html/.htaccess
+        #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./volumes/ucl/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
+
+    networks:
+      - inside
+    depends_on:
+      - db
+    restart: always
+
+  ucl_new:
+    image: birkbeckctp/ojs:2_4_3-0
+    env_file:
+      - .env
+    container_name: "ucl_new_ojs_app_${COMPOSE_PROJECT_NAME}"
+    hostname: "ucl_new-${COMPOSE_PROJECT_NAME}"
+    restart: always
+    ports:
+      - "8084:80"
+    volumes:
+      - /etc/localtime:/etc/localtime
+       # Create files or folders first and check permisions, to avoid errors:
+      - ./volumes/ucl_new/files:/vol/ojsfiles
+      - ./volumes/ucl_new/public:/var/www/html/public
+        #      - ./volumes/logs:/var/log/apache2
+      - ./volumes/ucl_new/config/config.inc.php:/var/www/html/config.inc.php
+        #      - ./config/apache.htaccess:/var/www/html/.htaccess
+        #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./volumes/ucl_new/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
 
     networks:
       - inside
