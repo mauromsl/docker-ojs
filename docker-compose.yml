@@ -26,6 +26,22 @@ services:
     restart: always
     volumes:
       - ./volumes/db:/var/lib/mysql
+      - ./volumes/db-conf:/etc/mysql/mariadb.conf.d
+
+  postgres:
+    image: postgres:10.7
+    env_file:
+      - .env
+    container_name: "ojs_postgres_${COMPOSE_PROJECT_NAME}"
+    environment:
+      POSTGRES_PASSWORD: ${MYSQL_PASSWORD}
+      POSTGRES_DB: ${MYSQL_DATABASE}
+      POSTGRES_USER: ${MYSQL_USER}
+    networks:
+      - inside
+    restart: always
+    volumes:
+      - ./volumes/postgres-data:/var/lib/postgresql/data
 
 
   arizona:
@@ -47,8 +63,8 @@ services:
       - ./volumes/config/config.inc.php:/var/www/html/config.inc.php
         #      - ./config/apache.htaccess:/var/www/html/.htaccess
         #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
-      - ./volumes/plugins/janeway:/var/www/html/plugins/generic/janeway
-      - ./volumes/plugins/ojs-janeway:/var/www/html/plugins/generic/ojs-janeway
+      - ./volumes/cg/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
+      - ./volumes/cg/plugins/ojs-janeway:/var/www/html/plugins/generic/ojs-janeway
 
     networks:
       - inside
@@ -57,7 +73,7 @@ services:
     restart: always
 
   cg:
-    image: birkbeckctp/ojs:2_4_3-0
+    image: birkbeckctp/ojs:2_4_3-0-draft_decisions
     env_file:
       - .env
     container_name: "cg_ojs_app_${COMPOSE_PROJECT_NAME}"
@@ -72,6 +88,32 @@ services:
       - ./volumes/cg/public:/var/www/html/public
         #      - ./volumes/logs:/var/log/apache2
       - ./volumes/cg/config/config.inc.php:/var/www/html/config.inc.php
+        #      - ./config/apache.htaccess:/var/www/html/.htaccess
+        #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./volumes/cg/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
+
+    networks:
+      - inside
+    depends_on:
+      - db
+    restart: always
+
+  olhj:
+    image: birkbeckctp/ojs:2_4_3-0-draft_decisions
+    env_file:
+      - .env
+    container_name: "olhj_ojs_app_${COMPOSE_PROJECT_NAME}"
+    hostname: "olhj-${COMPOSE_PROJECT_NAME}"
+    restart: always
+    ports:
+      - "8085:80"
+    volumes:
+      - /etc/localtime:/etc/localtime
+       # Create files or folders first and check permisions, to avoid errors:
+      - ./volumes/olhj/files:/vol/ojsfiles
+      - ./volumes/olhj/public:/var/www/html/public
+        #      - ./volumes/logs:/var/log/apache2
+      - ./volumes/olhj/config/config.inc.php:/var/www/html/config.inc.php
         #      - ./config/apache.htaccess:/var/www/html/.htaccess
         #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - ./volumes/cg/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
@@ -128,6 +170,58 @@ services:
         #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - ./volumes/ucl_new/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
 
+    networks:
+      - inside
+    depends_on:
+      - db
+    restart: always
+
+  ugent:
+    image: test3
+    env_file:
+      - .env
+    container_name: "ugent_ojs_app_${COMPOSE_PROJECT_NAME}"
+    hostname: "ugent-${COMPOSE_PROJECT_NAME}"
+    restart: always
+    ports:
+      - "8086:80"
+      - "8087:8000"
+    volumes:
+      - /etc/localtime:/etc/localtime
+       # Create files or folders first and check permisions, to avoid errors:
+      - ./volumes/ugent/files:/vol/ojsfiles
+      - ./volumes/ugent/public:/var/www/html/public
+        #      - ./volumes/logs:/var/log/apache2
+      - ./volumes/ugent/config/config.inc.php:/var/www/html/config.inc.php
+        #      - ./config/apache.htaccess:/var/www/html/.htaccess
+        #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./volumes/cg/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
+
+    networks:
+      - inside
+    depends_on:
+      - postgres
+    restart: always
+
+  glossa:
+    image: birkbeckctp/ojs:2_4_3-0-draft_decisions
+    env_file:
+      - .env
+    container_name: "glossa_ojs_app_${COMPOSE_PROJECT_NAME}"
+    hostname: "glossa-${COMPOSE_PROJECT_NAME}"
+    restart: always
+    ports:
+      - "8088:80"
+    volumes:
+      - /etc/localtime:/etc/localtime
+       # Create files or folders first and check permisions, to avoid errors:
+      - ./volumes/glossa/files:/vol/ojsfiles
+      - ./volumes/glossa/public:/var/www/html/public
+        #      - ./volumes/logs:/var/log/apache2
+      - ./volumes/glossa/config/config.inc.php:/var/www/html/config.inc.php
+        #      - ./config/apache.htaccess:/var/www/html/.htaccess
+        #      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./volumes/cg/plugins/ojs-janeway:/var/www/html/plugins/generic/janeway
     networks:
       - inside
     depends_on:
